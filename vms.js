@@ -16,6 +16,7 @@ app.use(express.json());
 // qr code middleware
 var QRCode = require('qrcode')
 
+
 // connect to mongodb
 const {
     MongoClient
