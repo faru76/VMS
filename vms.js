@@ -21,7 +21,7 @@ var QRCode = require('qrcode')
 const {
     MongoClient
 } = require('mongodb'); // import the mongodb client
-const url = "mongodb+srv://khanfairuz764:<password>@faruserver.1b8musi.mongodb.net/"; // the url to the database
+const url = "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/"; // the url to the database
 const client = new MongoClient(url); // create a new mongodb client
 
 // bcrypt middleware
