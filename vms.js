@@ -1,13 +1,14 @@
 const express = require('express');
 const session = require('express-session');
 const app = express();
-const port = 3000;
+const port = process.env.PORT||3000;
 
 // session middleware
 app.use(session({
-    secret: 'supercalifragilisticexpialidocious', // a random string used for encryption
+    secret: process.env.SESSION_SECRET || 'supercalifragilisticexpialidocious', // a random string used for encryption
     resave: false, // don't save session if unmodified
-    saveUninitialized: false // don't create session until something stored
+    saveUninitialized: false, // don't create session until something stored
+    //cookie: { domain: 'https://farubonvms.azurewebsites.net/' } // cookie settings
 }));
 
 // json middleware
@@ -21,7 +22,7 @@ var QRCode = require('qrcode')
 const {
     MongoClient
 } = require('mongodb'); // import the mongodb client
-const url = "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/"; // the url to the database
+const url = process.env.MONGODB_URI || "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/"; // the url to the database
 const client = new MongoClient(url); // create a new mongodb client
 
 // bcrypt middleware
@@ -38,6 +39,10 @@ async function run() {
             ping: 1
         });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+        app.get('/', (req, res) => {
+            res.send('Hello World!');
+        });
 
         app.post('/login', async (req, res) => {
             let data = req.body;
@@ -1006,8 +1011,16 @@ async function run() {
         });
 
         app.listen(port, () => {
-            console.log(`Example app listening at http://localhost:${port}`)
+            //console.log(`Example app listening at http://localhost:${port}`)
+            console.log(`Server is running on port ${process.env.PORT || 3000}`);
         });
+        
+        app.use((err, req, res, next) => {
+            console.error(err.stack);
+            res.status(500).send('Something went wrong!');
+          }); // error handling middleware
+
+        // finally, run the server
 
     } catch (e) {
         console.error(e);
