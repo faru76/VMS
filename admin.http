@@ -61,3 +61,6 @@ GET http://localhost:3000/dashboard/rejected
 
 ###
 GET http://localhost:3000/logout
+
+###
+GET http://localhost:3000/
