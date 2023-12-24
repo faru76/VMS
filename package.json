@@ -4,7 +4,7 @@
   "description": "",
   "main": "vms.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node vms.js"
   },
   "author": "",
   "license": "ISC",
