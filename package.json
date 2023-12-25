@@ -1,7 +1,7 @@
 {
   "name": "vms",
   "version": "1.0.0",
-  "description": "vms",
+  "description": "",
   "main": "vms.js",
   "scripts": {
     "start": "node vms.js"
