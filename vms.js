@@ -17,6 +17,52 @@ app.use(express.json());
 // qr code middleware
 var QRCode = require('qrcode')
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'VMS API',
+            version: '1.0.0',
+        },
+        servers: [{
+            url: 'https://farubonvms.azurewebsites.net/',
+            description: 'Production server'
+        }]
+    },
+    apis: ['./vms.js'],
+};
+
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+/**
+ * @swagger
+ * /login:
+ *  post:
+ *   description: Login to the system
+ *  requestBody:
+ *  content:
+ *  application/json:
+ * schema:
+ * type: object
+ * properties:
+ * username:
+ * type: string
+ * password:
+ * type: string
+ * required:
+ * - username
+ * - password
+ * responses:
+ * 200:
+ * description: Login successful
+ * 400:
+ * description: Username or password is incorrect
+ * 500:
+ * description: Internal server error
+ */
 
 // connect to mongodb
 const {
@@ -49,6 +95,7 @@ async function run() {
             // check if user exists
             const result = await client.db("Assignment").collection("Users").findOne({
                 _id: data.username
+
             });
 
             // if user exists, check if password is correct
