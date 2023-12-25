@@ -26,7 +26,7 @@ const url = process.env.MONGODB_URI || "mongodb+srv://khanfairuz764:011018@farus
 const client = new MongoClient(url); // create a new mongodb client
 
 // bcrypt middleware
-const bcrypt = require('bcrypt') // to hash the password
+const bcrypt = require('bcryptjs') // to hash the password
 const saltRounds = 13 // the higher the number the more secure, but slower
 
 async function run() {
