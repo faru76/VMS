@@ -97,9 +97,7 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Login successful
-         *       400:
-         *         description: Login failed
+         *         description: Reply from the server
          */
 
         app.post('/login', async (req, res) => {
@@ -156,15 +154,7 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Resident created
-         *       400:
-         *         description: Resident already exists
-         *       401:
-         *         description: You do not have the privilege to create a new resident
-         *       402:
-         *         description: You are not logged in
-         *       403:
-         *         description: Error creating a new resident
+         *         description: Reply from the server
          */
         app.post('/register/resident', async (req, res) => {
             if (req.session.user)
@@ -228,15 +218,8 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Resident removed
-         *       400:
-         *         description: Resident does not exist
-         *       401:
-         *         description: You do not have the privilege to remove a resident
-         *       402:
-         *         description: You are not logged in
+         *         description: Reply from the server
          */
-
         app.post('/remove/resident', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
@@ -294,15 +277,7 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Security created
-         *       400:
-         *         description: Security already exists
-         *       401:
-         *         description: You do not have the privilege to create a new security
-         *       402:
-         *         description: You are not logged in
-         *       403:
-         *         description: Error creating a new security
+         *         description: Reply from the server
          */
         app.post('/register/security', async (req, res) => {
             if (req.session.user)
@@ -362,15 +337,7 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Security removed
-         *       400:
-         *         description: Security does not exist
-         *       401:
-         *         description: You do not have the privilege to remove a security
-         *       402:
-         *         description: You are not logged in
-         *       403:
-         *         description: Error removing a security
+         *         description: Reply from the server
          */
         app.post('/remove/security', async (req, res) => {
             if (req.session.user)
@@ -410,7 +377,7 @@ async function run() {
          * /visitor/new:
          *   post:
          *     tags:
-         *       - Resident
+         *       - Visitor
          *     description: Create a new visitor request
          *     requestBody:
          *       required: true
@@ -435,17 +402,7 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Visitor request created
-         *       400:
-         *         description: Error creating a new visitor request
-         *       401:
-         *         description: You do not have the privilege to create a new visitor request
-         *       402:
-         *         description: You are not logged in
-         *       403:
-         *         description: Error creating a new visitor request
-         *       404:
-         *         description: Host or apartment not found
+         *         description: Reply from the server
          */
         app.post('/visitor/new', async (req, res) => {
             req.body._id = visitoridgenerator();
@@ -521,7 +478,7 @@ async function run() {
          * /visitor/status:
          *   post:
          *     tags:
-         *       - Resident
+         *       - Visitor
          *     description: Check visitor status
          *     requestBody:
          *       required: true
@@ -534,15 +491,7 @@ async function run() {
          *                 type: string
          *     responses:
          *       200:
-         *         description: Visitor status retrieved
-         *       400:
-         *         description: Visitor not found
-         *       401:
-         *         description: You do not have the privilege to check visitor status
-         *       402:
-         *         description: You are not logged in
-         *       403:
-         *         description: Error retrieving visitor status
+         *         description: Reply from the server
          */
         app.post('/visitor/status', async (req, res) => {
             data = req.body;
@@ -579,13 +528,7 @@ async function run() {
          *     description: Retrieve all visitors
          *     responses:
          *       200:
-         *         description: Visitors retrieved
-         *       400:
-         *         description: You do not have the privilege to view all visitors
-         *       401:
-         *         description: You are not logged in
-         *       402:
-         *         description: Error retrieving all visitors
+         *         description: Reply from the server
          */
         app.get('/dashboard', async (req, res) => {
             if (req.session.user) {
@@ -983,6 +926,41 @@ async function run() {
             }
         });
 
+
+        /**
+         * @swagger
+         * /dashboard/create:
+         *  post:
+         *     tags:
+         *       - Resident
+         *     description: Create a new visitor invite
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               name:
+         *                 type: string
+         *               carplate:
+         *                 type: string
+         *               identification:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *               visitpurpose:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Visitor invite created
+         *       400:
+         *         description: Error creating a new visitor invite
+         *       401:
+         *         description: You do not have the privilege to create a new visitor invite
+         *       402:
+         *         description: You are not logged in
+         */
         app.post('/dashboard/create', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
@@ -1068,6 +1046,26 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/approve:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Approve a visitor request
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.post('/dashboard/approve', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
@@ -1126,6 +1124,27 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/reject:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Reject a visitor request
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
+
         app.post('/dashboard/reject', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
@@ -1183,6 +1202,26 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /checkin:
+         *   post:
+         *     tags:
+         *       - Security
+         *     description: Check in a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.post('/checkin', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security") {
@@ -1223,6 +1262,26 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /checkout:
+         *   post:
+         *     tags:
+         *       - Security
+         *     description: Check out a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.post('/checkout', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security") {
@@ -1275,6 +1334,19 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /logout:
+         *   get:
+         *     tags:
+         *       - Resident
+         *       - Security
+         *       - Admin
+         *     description: Logout of the system
+         *     responses:
+         *       '200':
+         *         description: Reply from the server
+         */
         app.get('/logout', async (req, res) => {
             if (req.session.user) {
                 req.session.destroy();
