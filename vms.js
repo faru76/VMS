@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const app = express();
-const port = process.env.PORT||3000;
+const port = process.env.PORT || 3000;
 
 // session middleware
 app.use(session({
@@ -17,52 +17,24 @@ app.use(express.json());
 // qr code middleware
 var QRCode = require('qrcode')
 
+// swagger middleware
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'VMS API',
+            title: 'Welcome to FaruBon VMS API',
             version: '1.0.0',
         },
-        servers: [{
-            url: 'https://farubonvms.azurewebsites.net/',
-            description: 'Production server'
-        }]
     },
     apis: ['./vms.js'],
 };
 
+// swagger docs
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-/**
- * @swagger
- * /login:
- *  post:
- *   description: Login to the system
- *  requestBody:
- *  content:
- *  application/json:
- * schema:
- * type: object
- * properties:
- * username:
- * type: string
- * password:
- * type: string
- * required:
- * - username
- * - password
- * responses:
- * 200:
- * description: Login successful
- * 400:
- * description: Username or password is incorrect
- * 500:
- * description: Internal server error
- */
 
 // connect to mongodb
 const {
@@ -87,8 +59,31 @@ async function run() {
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
         app.get('/', (req, res) => {
-            res.send('Hello World!');
+            res.redirect('/api-docs');
         });
+
+        /**
+         * @swagger
+         * /login:
+         *   post:
+         *     description: Login to the system
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               username:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Login successful
+         *       400:
+         *         description: Login failed
+         */
 
         app.post('/login', async (req, res) => {
             let data = req.body;
@@ -118,6 +113,40 @@ async function run() {
             }
         });
 
+// /**
+//  * @swagger
+//  * /register/resident:
+//  *   post:
+//  *     description: Register a new resident
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             properties:
+//  *               _id:
+//  *                 type: string
+//  *               password:
+//  *                 type: string
+//  *               name:
+//  *                 type: string
+//  *               apartment:
+//  *                 type: string
+//  *               mobile:
+//  *                 type: string
+//  *     responses:
+//  *       200:
+//  *         description: Resident created
+//  *       400:
+//  *         description: Resident already exists
+//  *       401:
+//  *         description: You do not have the privilege to create a new resident
+//  *       402:
+//  *         description: You are not logged in
+//  *       403:
+//  *         description: Error creating a new resident
+//  */
         app.post('/register/resident', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
@@ -363,8 +392,7 @@ async function run() {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
                     try {
-                        result = await client.db("Assignment").collection("Visitors").aggregate([
-                            {
+                        result = await client.db("Assignment").collection("Visitors").aggregate([{
                                 $sort: {
                                     _id: -1
                                 }
@@ -398,7 +426,7 @@ async function run() {
                 } else if (req.session.user && req.session.user.role == "resident") {
                     try {
                         // list all pending visitors
-                        result = await client.db("Assignment").collection("Visitors").aggregate([                            {
+                        result = await client.db("Assignment").collection("Visitors").aggregate([{
                                 $sort: {
                                     _id: -1
                                 }
@@ -786,7 +814,7 @@ async function run() {
                             status: data.status
                         });
 
-                        QRCode.toDataURL(data._id,(err, url) => {
+                        QRCode.toDataURL(data._id, (err, url) => {
                             if (err) {
                                 res.send('Error generating QR code');
                             } else {
@@ -1061,11 +1089,11 @@ async function run() {
             //console.log(`Example app listening at http://localhost:${port}`)
             console.log(`Server is running on port ${process.env.PORT || 3000}`);
         });
-        
+
         app.use((err, req, res, next) => {
             console.error(err.stack);
             res.status(500).send('Something went wrong!');
-          }); // error handling middleware
+        }); // error handling middleware
 
         // finally, run the server
 
