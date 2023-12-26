@@ -35,6 +35,19 @@ const options = {
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Admin
+ *     description: Admin operations
+ *   - name: Security
+ *     description: Security operations
+ *   - name: Resident
+ *     description: Resident operations
+ *   - name: Visitor
+ *     description: Visitor operations
+ */
+
 
 // connect to mongodb
 const {
@@ -66,6 +79,10 @@ async function run() {
          * @swagger
          * /login:
          *   post:
+         *     tags: 
+         *      - Admin
+         *      - Security
+         *      - Resident
          *     description: Login to the system
          *     requestBody:
          *       required: true
@@ -113,40 +130,42 @@ async function run() {
             }
         });
 
-// /**
-//  * @swagger
-//  * /register/resident:
-//  *   post:
-//  *     description: Register a new resident
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             type: object
-//  *             properties:
-//  *               _id:
-//  *                 type: string
-//  *               password:
-//  *                 type: string
-//  *               name:
-//  *                 type: string
-//  *               apartment:
-//  *                 type: string
-//  *               mobile:
-//  *                 type: string
-//  *     responses:
-//  *       200:
-//  *         description: Resident created
-//  *       400:
-//  *         description: Resident already exists
-//  *       401:
-//  *         description: You do not have the privilege to create a new resident
-//  *       402:
-//  *         description: You are not logged in
-//  *       403:
-//  *         description: Error creating a new resident
-//  */
+        /**
+         * @swagger
+         * /register/resident:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Register a new resident
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Resident created
+         *       400:
+         *         description: Resident already exists
+         *       401:
+         *         description: You do not have the privilege to create a new resident
+         *       402:
+         *         description: You are not logged in
+         *       403:
+         *         description: Error creating a new resident
+         */
         app.post('/register/resident', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
@@ -191,6 +210,33 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /remove/resident:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Remove a resident
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Resident removed
+         *       400:
+         *         description: Resident does not exist
+         *       401:
+         *         description: You do not have the privilege to remove a resident
+         *       402:
+         *         description: You are not logged in
+         */
+
         app.post('/remove/resident', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
@@ -224,6 +270,40 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /register/security:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Register a new security
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Security created
+         *       400:
+         *         description: Security already exists
+         *       401:
+         *         description: You do not have the privilege to create a new security
+         *       402:
+         *         description: You are not logged in
+         *       403:
+         *         description: Error creating a new security
+         */
         app.post('/register/security', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
@@ -263,6 +343,35 @@ async function run() {
             }
         });
 
+
+        /**
+         * @swagger
+         * /remove/security:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Remove a security
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Security removed
+         *       400:
+         *         description: Security does not exist
+         *       401:
+         *         description: You do not have the privilege to remove a security
+         *       402:
+         *         description: You are not logged in
+         *       403:
+         *         description: Error removing a security
+         */
         app.post('/remove/security', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
