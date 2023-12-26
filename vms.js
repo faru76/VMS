@@ -405,6 +405,48 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /visitor/new:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Create a new visitor request
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               host:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               carplate:
+         *                 type: string
+         *               identification:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *               visitpurpose:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Visitor request created
+         *       400:
+         *         description: Error creating a new visitor request
+         *       401:
+         *         description: You do not have the privilege to create a new visitor request
+         *       402:
+         *         description: You are not logged in
+         *       403:
+         *         description: Error creating a new visitor request
+         *       404:
+         *         description: Host or apartment not found
+         */
         app.post('/visitor/new', async (req, res) => {
             req.body._id = visitoridgenerator();
             req.body.status = "pending";
@@ -474,6 +516,34 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /visitor/status:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Check visitor status
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Visitor status retrieved
+         *       400:
+         *         description: Visitor not found
+         *       401:
+         *         description: You do not have the privilege to check visitor status
+         *       402:
+         *         description: You are not logged in
+         *       403:
+         *         description: Error retrieving visitor status
+         */
         app.post('/visitor/status', async (req, res) => {
             data = req.body;
             result = await client.db("Assignment").collection("Visitors").findOne({
@@ -497,6 +567,26 @@ async function run() {
             }
         });
 
+
+        /**
+         * @swagger
+         * /dashboard:
+         *   get:
+         *     tags:
+         *       - Security
+         *       - Admin
+         *       - Resident
+         *     description: Retrieve all visitors
+         *     responses:
+         *       200:
+         *         description: Visitors retrieved
+         *       400:
+         *         description: You do not have the privilege to view all visitors
+         *       401:
+         *         description: You are not logged in
+         *       402:
+         *         description: Error retrieving all visitors
+         */
         app.get('/dashboard', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
