@@ -604,6 +604,19 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/pending:
+         *   get:
+         *     tags:
+         *       - Security
+         *       - Admin
+         *       - Resident
+         *     description: Retrieve all pending visitors
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.get('/dashboard/pending', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
@@ -682,6 +695,19 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/approved:
+         *   get:
+         *     tags:
+         *       - Security
+         *       - Admin
+         *       - Resident
+         *     description: Retrieve all approved visitors
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.get('/dashboard/approved', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
@@ -759,6 +785,19 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/rejected:
+         *   get:
+         *     tags:
+         *       - Security
+         *       - Admin
+         *       - Resident
+         *     description: Retrieve all rejected visitors
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.get('/dashboard/rejected', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
@@ -843,6 +882,19 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/history:
+         *   get:
+         *     tags:
+         *       - Security
+         *       - Admin
+         *       - Resident
+         *     description: Retrieve all pass visitors
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
         app.get('/dashboard/history', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
