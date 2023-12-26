@@ -5,7 +5,8 @@ const port = process.env.PORT || 3000;
 
 // session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'supercalifragilisticexpialidocious', // a random string used for encryption
+    secret: process.env.SESSION_SECRET,// a random string used for encryption
+    //secret: 'supercalifragilisticexpialidocious', // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     //cookie: { domain: 'https://farubonvms.azurewebsites.net/' } // cookie settings
@@ -52,7 +53,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 const {
     MongoClient
 } = require('mongodb'); // import the mongodb client
-const url = process.env.MONGODB_URI || "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/"; // the url to the database
+const url = process.env.MONGODB_URI // the url to the database
+//const url = "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/"
 const client = new MongoClient(url); // create a new mongodb client
 
 // bcrypt middleware
