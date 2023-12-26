@@ -38,16 +38,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 /**
  * @swagger
  * tags:
- *   - name: Admin
- *     description: Admin operations
- *   - name: Security
- *     description: Security operations
- *   - name: Resident
- *     description: Resident operations
  *   - name: Visitor
- *     description: Visitor operations
+ *     description: Visitor can apply for visit and check applicaton status, no login required
+ *   - name: Resident
+ *     description: Resident can create, approve and reject visitor invites, view their visitors, login required
+ *   - name: Security
+ *     description: Security can check in and check out visitors, view all visitors, login required 
+ *   - name: Admin
+ *     description: Admin can create and remove resident and security, view all visitors, login required
  */
-
 
 // connect to mongodb
 const {
