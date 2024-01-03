@@ -3,10 +3,21 @@ const session = require('express-session');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// connect to mongodb
+const {
+    MongoClient
+} = require('mongodb'); // import the mongodb client
+//const url = process.env.MONGODB_URI; // the url to the database
+const url = "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/";
+const client = new MongoClient(url); // create a new mongodb client
+
+const MongoStore = require('connect-mongo');
+
+
 // session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET,// a random string used for encryption
-    //secret: 'supercalifragilisticexpialidocious', // a random string used for encryption
+    //secret: process.env.SESSION_SECRET,// a random string used for encryption
+    secret: 'supercalifragilisticexpialidocious', // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     //cookie: { domain: 'https://farubonvms.azurewebsites.net/' } // cookie settings
@@ -49,13 +60,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *     description: Admin can create and remove resident and security, view all visitors, login required
  */
 
-// connect to mongodb
-const {
-    MongoClient
-} = require('mongodb'); // import the mongodb client
-const url = process.env.MONGODB_URI; // the url to the database
-//const url = "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/";
-const client = new MongoClient(url); // create a new mongodb client
+
 
 // bcrypt middleware
 const bcrypt = require('bcryptjs') // to hash the password
@@ -198,6 +203,70 @@ async function run() {
                 }
             else {
                 res.send("You are not logged in");
+            }
+        });
+
+        /**
+         * @swagger
+         * /register/testresident:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Register a new resident
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
+        app.post('/register/testresident', async (req, res) => {
+            data = req.body;
+            try {
+                //check if user already exists
+                result = await client.db("Assignment").collection("Users").findOne({
+                    _id: data._id,
+                    role: "resident"
+                });
+
+                if (result) {
+                    res.send("User already exists");
+                } else {
+                    //hash password
+                    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+                    //insert user
+                    const result = await client.db("Assignment").collection("Users").insertOne({
+                        _id: data._id,
+                        password: hashedPassword,
+                        role: "resident",
+                        name: data.name,
+                        apartment: data.apartment,
+                        mobile: data.mobile,
+                        pendingvisitors: [],
+                        incomingvisitors: [],
+                        pastvisitors: [],
+                        blockedvisitors: []
+                    });
+
+                    res.send('New resident created with the following id: ' + result.insertedId);
+                }
+            } catch (e) {
+                res.send("Error creating new resident");
             }
         });
 
