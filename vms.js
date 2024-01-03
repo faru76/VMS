@@ -127,33 +127,33 @@ async function run() {
                     console.log(req.session);
                     if (req.session.user.role == "admin") {
                         try {
-                            result = await client.db("Assignment").collection("Visitors").aggregate([{
-                                $sort: {
-                                    _id: -1
+                            result1 = await client.db("Assignment").collection("Visitors").aggregate([{
+                                    $sort: {
+                                        _id: -1
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        _id: 1,
+                                        host: 1,
+                                        apartment: 1,
+                                        name: 1,
+                                        carplate: 1,
+                                        identification: 1,
+                                        mobile: 1,
+                                        visitpurpose: 1,
+                                        status: 1,
+                                        reason: 1,
+                                        checkin: 1,
+                                        checkout: 1
+                                    }
                                 }
-                            },
-                            {
-                                $project: {
-                                    _id: 1,
-                                    host: 1,
-                                    apartment: 1,
-                                    name: 1,
-                                    carplate: 1,
-                                    identification: 1,
-                                    mobile: 1,
-                                    visitpurpose: 1,
-                                    status: 1,
-                                    reason: 1,
-                                    checkin: 1,
-                                    checkout: 1
-                                }
-                            }
-                        ]).toArray();
+                            ]).toArray();
 
                             res.send({
                                 to: req.session.user.name,
                                 message: 'Hello ' + req.session.user.name + ', you are now logged in as ' + req.session.user.role + '. Here are the list of all visitors: ',
-                                visitors: result
+                                visitors: result1
                             });
                         } catch (e) {
                             res.send("Error retrieving visitors");
@@ -675,15 +675,15 @@ async function run() {
                     try {
                         // list all pending visitors
                         result = await client.db("Assignment").collection("Visitors").aggregate([{
-                            $match: {
-                                host: req.session.user.username,
-                            }
-                        },
-                        {
-                            $sort: {
-                                _id: -1
-                            }
-                        },
+                                $match: {
+                                    host: req.session.user.username,
+                                }
+                            },
+                            {
+                                $sort: {
+                                    _id: -1
+                                }
+                            },
                             {
                                 $project: {
                                     _id: 1,
