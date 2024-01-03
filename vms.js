@@ -636,25 +636,22 @@ async function run() {
                         message: "Your visitor request is still pending approval from your host.",
                         details: result1
                     });
-                    }
-                }
-
-                if (result.status == "approved") {
+                } else if (result.status == "approved") {
                     res.send({
                         to: result1[0].name,
                         message: "Your visitor request has been approved. Please scan the QR code to check in.",
                         details: result1
                     });
-                }
-
-                if (result.status == "rejected") {
+                } else if (result.status == "rejected") {
                     res.send({
                         to: result1[0].name,
                         message: "Your visitor request has been rejected by your host. Please contact your host for more information.",
                         details: result1
                     });
+                } else {
+                    res.send("Invalid visitor status");
                 }
-            else {
+            } else {
                 res.send("Visitor not found");
             }
         });
