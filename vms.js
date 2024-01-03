@@ -639,7 +639,7 @@ async function run() {
                     }
                 }
 
-                if (result.status == "approved") {
+            else (result.status == "approved") {
                     res.send({
                         to: result1[0].name,
                         message: "Your visitor request has been approved. Please scan the QR code to check in.",
