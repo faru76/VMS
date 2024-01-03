@@ -125,7 +125,14 @@ async function run() {
                         apartment: result.apartment
                     }
                     console.log(req.session);
-                    res.send("Hello " + result.name);
+                    if (result.role == "admin") {
+                        res.send("Hello " + result.name + ", you are now logged in as " + result.role + ". Redirecting to dashboard...");
+                        setTimeout(function () {
+                            res.redirect('/dashboard');
+                        }, 3000);
+                    } else {
+                        res.send("Hello " + result.name + ", you are now logged in as " + result.role);
+                    }
                 } else {
                     res.send("Wrong Password");
                 }
@@ -212,7 +219,7 @@ async function run() {
          *   post:
          *     tags:
          *       - Admin
-         *     description: Register a new resident
+         *     description: Register a new test resident, without admin previlege
          *     requestBody:
          *       required: true
          *       content:
