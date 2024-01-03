@@ -600,7 +600,7 @@ async function run() {
          *         description: Reply from the server
          */
         app.post('/visitor/status', async (req, res) => {
-            data = req.body;
+            let data = req.body;
             try {
                 result = await client.db("Assignment").collection("Visitors").aggregate([{
                         $match: {
