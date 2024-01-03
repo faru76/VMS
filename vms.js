@@ -631,17 +631,30 @@ async function run() {
 
             if (result) {
                 if (result.status == "pending") {
-                    res.send(result1 + "Your visitor request is still pending. Please wait for approval from your host.");
+                    res.send({
+                        to: result1[0].name,
+                        message: "Your visitor request is still pending approval from your host.",
+                        details: result1
+                    });
+                    }
                 }
 
                 if (result.status == "approved") {
-                    res.send(result1 + "Your visitor request has been approved. Please proceed to the security guard house to register your visit.");
+                    res.send({
+                        to: result1[0].name,
+                        message: "Your visitor request has been approved. Please scan the QR code to check in.",
+                        details: result1
+                    });
                 }
 
                 if (result.status == "rejected") {
-                    res.send(result1 + "Your visitor request has been rejected. Please contact your host for more information.");
+                    res.send({
+                        to: result1[0].name,
+                        message: "Your visitor request has been rejected by your host. Please contact your host for more information.",
+                        details: result1
+                    });
                 }
-            } else {
+            else {
                 res.send("Visitor not found");
             }
         });
