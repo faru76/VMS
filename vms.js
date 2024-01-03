@@ -128,27 +128,27 @@ async function run() {
                     if (req.session.user.role == "admin") {
                         try {
                             result = await client.db("Assignment").collection("Visitors").aggregate([{
-                                    $sort: {
-                                        _id: -1
-                                    }
-                                },
-                                {
-                                    $project: {
-                                        _id: 1,
-                                        host: 1,
-                                        apartment: 1,
-                                        name: 1,
-                                        carplate: 1,
-                                        identification: 1,
-                                        mobile: 1,
-                                        visitpurpose: 1,
-                                        status: 1,
-                                        reason: 1,
-                                        checkin: 1,
-                                        checkout: 1
-                                    }
+                                $sort: {
+                                    _id: -1
                                 }
-                            ]).toArray();
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    host: 1,
+                                    apartment: 1,
+                                    name: 1,
+                                    carplate: 1,
+                                    identification: 1,
+                                    mobile: 1,
+                                    visitpurpose: 1,
+                                    status: 1,
+                                    reason: 1,
+                                    checkin: 1,
+                                    checkout: 1
+                                }
+                            }
+                        ]).toArray();
 
                             res.send({
                                 to: req.session.user.name,
@@ -675,13 +675,15 @@ async function run() {
                     try {
                         // list all pending visitors
                         result = await client.db("Assignment").collection("Visitors").aggregate([{
-                                $match: {
-                                    host: req.session.user.username
-                                },
-                                $sort: {
-                                    _id: -1
-                                }
-                            },
+                            $match: {
+                                host: req.session.user.username,
+                            }
+                        },
+                        {
+                            $sort: {
+                                _id: -1
+                            }
+                        },
                             {
                                 $project: {
                                     _id: 1,
@@ -704,7 +706,7 @@ async function run() {
                             visitors: result
                         });
                     } catch (e) {
-                        res.send("Error retrieving pending visitors");
+                        res.send("Error retrieving visitors");
                     }
                 } else {
                     res.send("You do not have the previlege to view pending visitors");
