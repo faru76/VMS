@@ -492,8 +492,6 @@ async function run() {
          *           schema:
          *             type: object
          *             properties:
-         *               host:
-         *                 type: string
          *               apartment:
          *                 type: string
          *               name:
@@ -517,7 +515,6 @@ async function run() {
             try {
                 // add visitor to host's pending visitors
                 await client.db("Assignment").collection("Users").updateOne({
-                    _id: data.host,
                     apartment: data.apartment
                 }, {
                     $push: {
@@ -526,7 +523,24 @@ async function run() {
                 });
 
                 // insert visitor into database
-                const result = await client.db("Assignment").collection("Visitors").insertOne(data);
+                // add the host id into data
+                hostid = await client.db("Assignment").collection("Users").findOne({
+                    apartment: data.apartment
+                });
+                data.host = hostid._id;
+                //const result = await client.db("Assignment").collection("Visitors").insertOne(data);
+
+                const result = await client.db("Assignment").collection("Visitors").insertOne({
+                    _id: data._id,
+                    host: data.host,
+                    apartment: data.apartment,
+                    name: data.name,
+                    carplate: data.carplate,
+                    identification: data.identification,
+                    mobile: data.mobile,
+                    visitpurpose: data.visitpurpose,
+                    status: data.status
+                });
 
                 // generate QR code
                 QRCode.toDataURL(data._id, async (err, url) => {
@@ -622,7 +636,6 @@ async function run() {
                     {
                         $project: {
                             _id: 1,
-                            host: 1,
                             apartment: 1,
                             name: 1,
                             carplate: 1,
@@ -630,6 +643,7 @@ async function run() {
                             mobile: 1,
                             visitpurpose: 1,
                             status: 1,
+                            qrcode: 1,
                         }
                     }
                 ]).toArray();
@@ -1171,7 +1185,7 @@ async function run() {
                 if (req.session.user.role == "resident") {
                     req.body._id = visitoridgenerator();
                     req.body.status = "approved";
-                    req.body.host = req.session.user.username;
+                    req.body.host = req.session.user.name;
                     req.body.apartment = req.session.user.apartment;
                     data = req.body;
                     try {
@@ -1212,7 +1226,6 @@ async function run() {
                                     "message": "Your visitor request has been submitted, Please wait for approval from your host.",
                                     "qrcode": url,
                                     "visitorid": data._id,
-                                    "host": data.host,
                                     "apartment": data.apartment,
                                     "name": data.name,
                                     "carplate": data.carplate,
