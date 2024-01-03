@@ -559,7 +559,6 @@ async function run() {
                             "message": "Your visitor request has been submitted, Please wait for approval from your host.",
                             "qrcode": url,
                             "visitorid": data._id,
-                            "host": data.host,
                             "apartment": data.apartment,
                             "name": data.name,
                             "carplate": data.carplate,
@@ -1366,6 +1365,8 @@ async function run() {
          *             properties:
          *               _id:
          *                 type: string
+         *              reason:
+         *                type: string
          *     responses:
          *       200:
          *         description: Reply from the server
