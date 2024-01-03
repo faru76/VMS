@@ -601,41 +601,45 @@ async function run() {
          */
         app.post('/visitor/status', async (req, res) => {
             data = req.body;
-            result = await client.db("Assignment").collection("Visitors").aggregate([{
-                $match: {
-                    _id: data._id
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    host: 1,
-                    apartment: 1,
-                    name: 1,
-                    carplate: 1,
-                    identification: 1,
-                    mobile: 1,
-                    visitpurpose: 1,
-                    status: 1,
-                    reason: 1,
-                }
-            }
-        ]).toArray();
+            try {
+                result = await client.db("Assignment").collection("Visitors").aggregate([{
+                        $match: {
+                            _id: data._id
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            host: 1,
+                            apartment: 1,
+                            name: 1,
+                            carplate: 1,
+                            identification: 1,
+                            mobile: 1,
+                            visitpurpose: 1,
+                            status: 1,
+                            reason: 1,
+                        }
+                    }
+                ]).toArray();
 
-            if (result) {
-                if (result.status == "pending") {
-                    res.send(result + "Your visitor request is still pending. Please wait for approval from your host.");
-                }
+                if (result) {
+                    if (result.status == "pending") {
+                        res.send(result + "Your visitor request is still pending. Please wait for approval from your host.");
+                    }
 
-                if (result.status == "approved") {
-                    res.send(result + "Your visitor request has been approved. Please proceed to the security guard house to register your visit.");
-                }
+                    if (result.status == "approved") {
+                        res.send(result + "Your visitor request has been approved. Please proceed to the security guard house to register your visit.");
+                    }
 
-                if (result.status == "rejected") {
-                    res.send(result+ "Your visitor request has been rejected. Please contact your host for more information.");
+                    if (result.status == "rejected") {
+                        res.send(result + "Your visitor request has been rejected. Please contact your host for more information.");
+                    }
+                } else {
+                    res.send("Visitor not found");
                 }
-            } else {
-                res.send("Visitor not found");
+            } catch (e) {
+                res.send("Error retrieving visitor status");
             }
         });
 
