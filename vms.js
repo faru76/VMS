@@ -1184,7 +1184,7 @@ async function run() {
                 if (req.session.user.role == "resident") {
                     req.body._id = visitoridgenerator();
                     req.body.status = "approved";
-                    req.body.host = req.session.user.name;
+                    req.body.host = req.session.user.username;
                     req.body.apartment = req.session.user.apartment;
                     data = req.body;
                     try {
@@ -1220,9 +1220,9 @@ async function run() {
                                         qrcode: url
                                     }
                                 });
-        
+
                                 res.send({
-                                    "message": "Your visitor request has been submitted, Please wait for approval from your host.",
+                                    "message": "You have created a new visitor invite, Please send the QR code to your visitor.",
                                     "qrcode": url,
                                     "visitorid": data._id,
                                     "apartment": data.apartment,
