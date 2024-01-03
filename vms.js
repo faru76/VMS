@@ -1196,12 +1196,20 @@ async function run() {
                             status: data.status
                         });
 
-                        QRCode.toDataURL(data._id, (err, url) => {
+                        QRCode.toDataURL(data._id, async (err, url) => {
                             if (err) {
                                 res.send('Error generating QR code');
                             } else {
+                                await client.db("Assignment").collection("Visitors").updateOne({
+                                    _id: data._id
+                                }, {
+                                    $set: {
+                                        qrcode: url
+                                    }
+                                });
+        
                                 res.send({
-                                    "message": "You have created a new visitor invite, Please send the QR code to your visitor.",
+                                    "message": "Your visitor request has been submitted, Please wait for approval from your host.",
                                     "qrcode": url,
                                     "visitorid": data._id,
                                     "host": data.host,
