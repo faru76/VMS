@@ -529,10 +529,18 @@ async function run() {
                 const result = await client.db("Assignment").collection("Visitors").insertOne(data);
 
                 // generate QR code
-                QRCode.toDataURL(data._id, (err, url) => {
+                QRCode.toDataURL(data._id, async (err, url) => {
                     if (err) {
                         res.send('Error generating QR code');
                     } else {
+                        await client.db("Assignment").collection("Visitors").updateOne({
+                            _id: data._id
+                        }, {
+                            $set: {
+                                qrcode: url
+                            }
+                        });
+
                         res.send({
                             "message": "Your visitor request has been submitted, Please wait for approval from your host.",
                             "qrcode": url,
