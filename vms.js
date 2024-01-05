@@ -1498,7 +1498,7 @@ async function run() {
                                             phone: 1,
                                         }
                                     }
-                                ]).toArray2();
+                                ]).toArray();
                             } catch (e) {
                                 res.send("Error retrieving host details");
                             }
@@ -1506,7 +1506,8 @@ async function run() {
                             res.send({
                                 to: req.session.user.name,
                                 message:"Here is the detail of the visitor and the host.",
-                                details: result1 + result2
+                                visitordetails: result1,
+                                hostdetails: result2
                             })
 
                         } else {
