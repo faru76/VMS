@@ -50,6 +50,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 /**
  * @swagger
  * tags:
+ *   - name: Test
+ *     description: Create a test resident account without admin/security previlege
  *   - name: Visitor
  *     description: Visitor can apply for visit and check applicaton status, no login required
  *   - name: Resident
@@ -247,7 +249,7 @@ async function run() {
          * /register/testresident:
          *   post:
          *     tags:
-         *       - Admin
+         *       - Test
          *     description: Register a new test resident, without admin previlege
          *     requestBody:
          *       required: true
@@ -1506,7 +1508,7 @@ async function run() {
 
                             res.send({
                                 to: req.session.user.name,
-                                message:"Here is the detail of the visitor and the host.",
+                                message: "Here is the detail of the visitor and the host.",
                                 visitordetails: result1,
                                 hostdetails: result2
                             })
