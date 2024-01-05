@@ -1493,6 +1493,7 @@ async function run() {
                                     },
                                     {
                                         $project: {
+                                            _id: 0, //exclude _id, otherwise it will be included by default
                                             name: 1,
                                             phone: 1,
                                             apartment: 1,
