@@ -165,10 +165,10 @@ async function run() {
                         res.send("Hello " + result.name + ", you are now logged in as " + result.role);
                     }
                 } else {
-                    res.send("Wrong Password");
+                    res.send("Wrong Username or Password");
                 }
             } else {
-                res.send("Username not found");
+                res.send("Wrong Username or Password");
             }
         });
 
@@ -1437,7 +1437,7 @@ async function run() {
          *   post:
          *     tags:
          *       - Security
-         *     description: Check in a visitor
+         *     description: Check a visitor and host details
          *     requestBody:
          *       required: true
          *       content:
@@ -1521,7 +1521,7 @@ async function run() {
                         res.send("Error checking visitor details");
                     }
                 } else {
-                    res.send("You do not have the previlege to check in a visitor");
+                    res.send("You do not have the previlege to check a visitor");
                 }
             } else {
                 res.send("You are not logged in");
