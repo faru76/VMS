@@ -1470,7 +1470,6 @@ async function run() {
                                     {
                                         $project: {
                                             _id: 1,
-                                            apartment: 1,
                                             name: 1,
                                             carplate: 1,
                                             identification: 1,
@@ -1489,13 +1488,14 @@ async function run() {
                             try {
                                 result2 = await client.db("Assignment").collection("Users").aggregate([{
                                         $match: {
-                                            _id: data._id
+                                            apartment: result1[0].apartment,
                                         }
                                     },
                                     {
                                         $project: {
                                             name: 1,
                                             phone: 1,
+                                            apartment: 1,
                                         }
                                     }
                                 ]).toArray();
