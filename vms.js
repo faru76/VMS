@@ -647,7 +647,7 @@ async function run() {
                     }
                 ]).toArray();
             } catch (e) {
-                res.send("Error retrieving pending visitors");
+                res.send("Error retrieving visitor status");
             }
 
             if (result) {
@@ -1428,6 +1428,102 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /check:
+         *   post:
+         *     tags:
+         *       - Security
+         *     description: Check in a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Reply from the server
+         */
+        app.post('/check', async (req, res) => {
+            if (req.session.user) {
+                if (req.session.user.role == "security") {
+                    data = req.body;
+                    try {
+                        //check if visitor exists
+                        result = await client.db("Assignment").collection("Visitors").findOne({
+                            _id: data._id
+                        });
+
+                        if (result) {
+                            //check visitor status
+                            try {
+                                result1 = await client.db("Assignment").collection("Visitors").aggregate([{
+                                        $match: {
+                                            _id: data._id
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            apartment: 1,
+                                            name: 1,
+                                            carplate: 1,
+                                            identification: 1,
+                                            mobile: 1,
+                                            visitpurpose: 1,
+                                            status: 1,
+                                            qrcode: 1,
+                                        }
+                                    }
+                                ]).toArray();
+                            } catch (e) {
+                                res.send("Error retrieving visitor status");
+                            }
+
+                            //check who is the host
+                            try {
+                                result2 = await client.db("Assignment").collection("Users").aggregate([{
+                                        $match: {
+                                            _id: data._id
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            name: 1,
+                                            phone: 1,
+                                        }
+                                    }
+                                ]).toArray2();
+                            } catch (e) {
+                                res.send("Error retrieving host details");
+                            }
+
+                            res.send({
+                                to: req.session.user.name,
+                                message:"Here is the detail of the visitor and the host.",
+                                details: result1 + result2
+                            })
+
+                        } else {
+                            res.send("Visitor not found");
+                        }
+
+                    } catch (e) {
+                        res.send("Error checking visitor details");
+                    }
+                } else {
+                    res.send("You do not have the previlege to check in a visitor");
+                }
+            } else {
+                res.send("You are not logged in");
+            }
+        });
+
 
         /**
          * @swagger
