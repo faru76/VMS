@@ -1488,7 +1488,7 @@ async function run() {
                             try {
                                 result2 = await client.db("Assignment").collection("Users").aggregate([{
                                         $match: {
-                                            apartment: result1[0].apartment,
+                                            apartment: result.apartment
                                         }
                                     },
                                     {
