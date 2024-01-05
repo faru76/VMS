@@ -142,7 +142,7 @@ async function run() {
                                         name: 1,
                                         carplate: 1,
                                         identification: 1,
-                                        mobile: 1,
+                                        phone: 1,
                                         visitpurpose: 1,
                                         status: 1,
                                         reason: 1,
@@ -194,7 +194,7 @@ async function run() {
          *                 type: string
          *               apartment:
          *                 type: string
-         *               mobile:
+         *               phone:
          *                 type: string
          *     responses:
          *       200:
@@ -224,7 +224,7 @@ async function run() {
                                 role: "resident",
                                 name: data.name,
                                 apartment: data.apartment,
-                                mobile: data.mobile,
+                                phone: data.phone,
                                 pendingvisitors: [],
                                 incomingvisitors: [],
                                 pastvisitors: [],
@@ -266,7 +266,7 @@ async function run() {
          *                 type: string
          *               apartment:
          *                 type: string
-         *               mobile:
+         *               phone:
          *                 type: string
          *     responses:
          *       200:
@@ -294,7 +294,7 @@ async function run() {
                         role: "resident",
                         name: data.name,
                         apartment: data.apartment,
-                        mobile: data.mobile,
+                        phone: data.phone,
                         pendingvisitors: [],
                         incomingvisitors: [],
                         pastvisitors: [],
@@ -381,7 +381,7 @@ async function run() {
          *                 type: string
          *               name:
          *                 type: string
-         *               mobile:
+         *               phone:
          *                 type: string
          *     responses:
          *       200:
@@ -410,7 +410,7 @@ async function run() {
                                 password: hashedPassword,
                                 role: "security",
                                 name: data.name,
-                                mobile: data.mobile
+                                phone: data.phone
                             });
 
                             res.send('New security created with the following id: ' + result.insertedId);
@@ -502,7 +502,7 @@ async function run() {
          *                 type: string
          *               identification:
          *                 type: string
-         *               mobile:
+         *               phone:
          *                 type: string
          *               visitpurpose:
          *                 type: string
@@ -539,7 +539,7 @@ async function run() {
                     name: data.name,
                     carplate: data.carplate,
                     identification: data.identification,
-                    mobile: data.mobile,
+                    phone: data.phone,
                     visitpurpose: data.visitpurpose,
                     status: data.status
                 });
@@ -565,7 +565,7 @@ async function run() {
                             "name": data.name,
                             "carplate": data.carplate,
                             "identification": data.identification,
-                            "mobile": data.mobile,
+                            "phone": data.phone,
                             "visitpurpose": data.visitpurpose,
                         });
                     }
@@ -592,7 +592,7 @@ async function run() {
                 //             "name": data.name,
                 //             "carplate": data.carplate,
                 //             "identification": data.identification,
-                //             "mobile": data.mobile,
+                //             "phone": data.phone,
                 //             "visitpurpose": data.visitpurpose,
                 //         });
                 //     }
@@ -641,7 +641,7 @@ async function run() {
                             name: 1,
                             carplate: 1,
                             identification: 1,
-                            mobile: 1,
+                            phone: 1,
                             visitpurpose: 1,
                             status: 1,
                             qrcode: 1,
@@ -710,7 +710,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                     status: 1,
                                     reason: 1,
@@ -747,7 +747,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                     status: 1,
                                     reason: 1,
@@ -808,7 +808,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                 }
                             }
@@ -842,7 +842,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                 }
                             }
@@ -899,7 +899,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                 }
                             }
@@ -932,7 +932,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                 }
                             }
@@ -989,7 +989,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                     reason: 1
                                 }
@@ -1028,7 +1028,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                     reason: 1
                                 }
@@ -1086,7 +1086,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                     checkin: 1,
                                     checkout: 1
@@ -1122,7 +1122,7 @@ async function run() {
                                     name: 1,
                                     carplate: 1,
                                     identification: 1,
-                                    mobile: 1,
+                                    phone: 1,
                                     visitpurpose: 1,
                                     checkin: 1,
                                     checkout: 1
@@ -1167,7 +1167,7 @@ async function run() {
          *                 type: string
          *               identification:
          *                 type: string
-         *               mobile:
+         *               phone:
          *                 type: string
          *               visitpurpose:
          *                 type: string
@@ -1206,7 +1206,7 @@ async function run() {
                             name: data.name,
                             carplate: data.carplate,
                             identification: data.identification,
-                            mobile: data.mobile,
+                            phone: data.phone,
                             visitpurpose: data.visitpurpose,
                             status: data.status
                         });
@@ -1231,7 +1231,7 @@ async function run() {
                                     "name": data.name,
                                     "carplate": data.carplate,
                                     "identification": data.identification,
-                                    "mobile": data.mobile,
+                                    "phone": data.phone,
                                     "visitpurpose": data.visitpurpose,
                                 });
                             }
@@ -1257,7 +1257,7 @@ async function run() {
                         //             "name": data.name,
                         //             "carplate": data.carplate,
                         //             "identification": data.identification,
-                        //             "mobile": data.mobile,
+                        //             "phone": data.phone,
                         //             "visitpurpose": data.visitpurpose,
                         //         });
                         //     }
@@ -1475,7 +1475,7 @@ async function run() {
                                             name: 1,
                                             carplate: 1,
                                             identification: 1,
-                                            mobile: 1,
+                                            phone: 1,
                                             visitpurpose: 1,
                                             status: 1,
                                             qrcode: 1,
