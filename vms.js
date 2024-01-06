@@ -129,25 +129,26 @@ async function run() {
                     console.log(req.session);
                     if (req.session.user.role == "admin") {
                         try {
-                            result1 = await client.db("Assignment").collection("Visitors").aggregate([{
+                            result1 = await client.db("Assignment").collection("Users").aggregate([{
+                                    $match: {
+                                        role: "resident"
+                                    }
+                                },
+                                {
                                     $sort: {
-                                        _id: -1
+                                        _id: 1
                                     }
                                 },
                                 {
                                     $project: {
                                         _id: 1,
-                                        host: 1,
-                                        apartment: 1,
                                         name: 1,
-                                        carplate: 1,
-                                        identification: 1,
+                                        apartment: 1,
                                         phone: 1,
-                                        visitpurpose: 1,
-                                        status: 1,
-                                        reason: 1,
-                                        checkin: 1,
-                                        checkout: 1
+                                        pendingvisitors: 1,
+                                        incomingvisitors: 1,
+                                        pastvisitors: 1,
+                                        blockedvisitors: 1
                                     }
                                 }
                             ]).toArray();
