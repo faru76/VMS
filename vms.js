@@ -153,10 +153,30 @@ async function run() {
                                 }
                             ]).toArray();
 
+                            result2 = await client.db("Assignment").collection("Users").aggregate([{
+                                    $match: {
+                                        role: "security"
+                                    }
+                                },
+                                {
+                                    $sort: {
+                                        _id: 1
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        _id: 1,
+                                        name: 1,
+                                        phone: 1,
+                                    }
+                                }
+                            ]).toArray();
+
                             res.send({
                                 to: req.session.user.name,
-                                message: 'Hello ' + req.session.user.name + ', you are now logged in as ' + req.session.user.role + '. Here are the list of all visitors: ',
-                                visitors: result1
+                                message: 'Hello ' + ', you are now logged in as ' + req.session.user.role + '. Here are the list of all residents and securities: ',
+                                residents: result1,
+                                securities: result2
                             });
                         } catch (e) {
                             res.send("Error retrieving visitors");
