@@ -1388,13 +1388,12 @@ async function run() {
          *             properties:
          *               _id:
          *                 type: string
-         *              reason:
-         *                type: string
+         *               reason:
+         *                 type: string
          *     responses:
          *       200:
          *         description: Reply from the server
          */
-
         app.post('/dashboard/reject', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
