@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,17 +12,24 @@ const {
 const url = "mongodb+srv://khanfairuz764:011018@faruserver.1b8musi.mongodb.net/";
 const client = new MongoClient(url); // create a new mongodb client
 
-const MongoStore = require('connect-mongo');
-
-
 // session middleware
 app.use(session({
     //secret: process.env.SESSION_SECRET,// a random string used for encryption
     secret: 'supercalifragilisticexpialidocious', // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
-    //cookie: { domain: 'https://farubonvms.azurewebsites.net/' } // cookie settings
+    cookie: {
+        domain: 'https://farubonvms.azurewebsites.net/',
+        secure: true, // set to true if your using https
+        maxAge: 1000 * 60 * 60 * 24 // 1 day
+    },
 }));
+
+// rate limiter middleware
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute window 
+    max: 10 // start blocking after 10 requests
+});
 
 // json middleware
 app.use(express.json());
@@ -61,8 +69,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *   - name: Admin
  *     description: Admin can create and remove resident and security, view all visitors, login required
  */
-
-
 
 // bcrypt middleware
 const bcrypt = require('bcryptjs') // to hash the password
@@ -108,7 +114,7 @@ async function run() {
          *         description: Reply from the server
          */
 
-        app.post('/login', async (req, res) => {
+        app.post('/login', limiter, async (req, res) => {
             let data = req.body;
             // check if user exists
             const result = await client.db("Assignment").collection("Users").findOne({
