@@ -19,7 +19,6 @@ app.use(session({
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     cookie: {
-        domain: 'https://farubonvms.azurewebsites.net/',
         secure: true, // set to true if your using https
         maxAge: 1000 * 60 * 60 * 24 // 1 day
     },
