@@ -18,7 +18,7 @@ app.use(session({
     secret: 'supercalifragilisticexpialidocious', // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
-    cookie: { // set to true if your using https
+    cookie: { 
         maxAge: 1000 * 60 * 60 * 24 // 1 day
     },
 }));
