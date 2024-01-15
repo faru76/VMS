@@ -38,6 +38,9 @@ const store = MongoStore.create({
     dbName: "Assignment",
     collectionName: "Sessions",
     ttl: 60 * 60 * 24, // 1 day
+    crypto:{
+        secret: process.env.SESSION_SAVE_SECRET
+    }
 });
 
 // session middleware
@@ -51,7 +54,9 @@ app.use(session({
     saveUninitialized: false, // don't create session until something stored
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
-        //secure:true
+        secure:true,
+        httpOnly:true,
+        sameSite:"strict"
     },
     store:store
 }));
