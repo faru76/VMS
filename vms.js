@@ -1,12 +1,23 @@
+//express middleware
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const app = express();
 
+// json middleware
+app.use(express.json());
+
+// rate limiter middleware
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute window 
+    max: 10 // start blocking after 10 requests
+});
+
+//dotenv middleware
 require('dotenv').config();
+
+//port declaration
 const port = process.env.PORT || 3000;
-
-
 
 // connect to mongodb
 const {
@@ -17,25 +28,33 @@ const client = new MongoClient(url); // create a new mongodb client
 
 // session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET,// a random string used for encryption
+    secret: process.env.SESSION_SECRET, // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
-    cookie: { 
+    cookie: {
         maxAge: 1000 * 60 * 60 * 24 // 1 day
     },
+    
 }));
-
-// rate limiter middleware
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute window 
-    max: 10 // start blocking after 10 requests
-});
-
-// json middleware
-app.use(express.json());
 
 // qr code middleware
 var QRCode = require('qrcode')
+
+// bcrypt middleware
+const bcrypt = require('bcryptjs') // to hash the password
+const saltRounds = 13 // the higher the number the more secure, but slower
+
+//password validator middleware
+const passwordValidator = require('password-validator');
+const schema = new passwordValidator();
+schema
+    .is().min(8, 'minimum length of 8 characters') // Minimum length 8
+    .is().max(20, 'maximum length of 20 characters') // Maximum length 100
+    .has().uppercase(1, 'minimum of 1 uppercase letter') // Must have uppercase letters
+    .has().lowercase(1, 'minimum of 1 lowercase letter') // Must have lowercase letters
+    .has().digits(1, 'minimum of 1 digit') // Must have digits
+    .has().not().spaces(0, 'no spaces') // Should not have spaces
+    .has().symbols(1, 'minimum of 1 symbol') // Must have symbols
 
 // swagger middleware
 const swaggerUi = require('swagger-ui-express');
@@ -70,9 +89,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *     description: Admin can create and remove resident and security, view all visitors, login required
  */
 
-// bcrypt middleware
-const bcrypt = require('bcryptjs') // to hash the password
-const saltRounds = 13 // the higher the number the more secure, but slower
 
 async function run() {
     try {
@@ -216,6 +232,7 @@ async function run() {
          *               _id:
          *                 type: string
          *               password:
+         *                 description: Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 lowercase letter, 1 digit and 1 symbol
          *                 type: string
          *               name:
          *                 type: string
@@ -239,26 +256,36 @@ async function run() {
                         });
 
                         if (result) {
-                            res.send("User already exists");
+                            res.send("Resident already exists");
                         } else {
-                            //hash password
-                            const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-
-                            //insert user
-                            const result = await client.db("Assignment").collection("Users").insertOne({
-                                _id: data._id,
-                                password: hashedPassword,
-                                role: "resident",
-                                name: data.name,
-                                apartment: data.apartment,
-                                phone: data.phone,
-                                pendingvisitors: [],
-                                incomingvisitors: [],
-                                pastvisitors: [],
-                                blockedvisitors: []
+                            //validate password
+                            const validation = schema.validate(data.password, {
+                                details: true
                             });
 
-                            res.send('New resident created with the following id: ' + result.insertedId);
+                            if (validation.length > 0) {
+                                errorMessages = validation.map((detail) => detail.message).join('\n');
+                                res.send("Password does not meet the following requirements: \n" + errorMessages);
+                            } else {
+                                //hash password
+                                const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+                                //insert user
+                                const result = await client.db("Assignment").collection("Users").insertOne({
+                                    _id: data._id,
+                                    password: hashedPassword,
+                                    role: "resident",
+                                    name: data.name,
+                                    apartment: data.apartment,
+                                    phone: data.phone,
+                                    pendingvisitors: [],
+                                    incomingvisitors: [],
+                                    pastvisitors: [],
+                                    blockedvisitors: []
+                                });
+
+                                res.send('New resident created with the following id: ' + result.insertedId);
+                            }
                         }
                     } catch (e) {
                         res.send("Error creating new resident");
@@ -300,38 +327,56 @@ async function run() {
          *         description: Reply from the server
          */
         app.post('/register/testresident', async (req, res) => {
-            data = req.body;
-            try {
-                //check if user already exists
-                result = await client.db("Assignment").collection("Users").findOne({
-                    _id: data._id,
-                    role: "resident"
-                });
+            if (req.session.user)
+                if (req.session.user.role == "admin") {
+                    data = req.body;
+                    try {
+                        //check if user already exists
+                        result = await client.db("Assignment").collection("Users").findOne({
+                            _id: data._id,
+                            role: "resident"
+                        });
 
-                if (result) {
-                    res.send("User already exists");
+                        if (result) {
+                            res.send("Resident already exists");
+                        } else {
+                            //validate password
+                            const validation = schema.validate(data.password, {
+                                details: true
+                            });
+
+                            if (validation.length > 0) {
+                                errorMessages = validation.map((detail) => detail.message).join('\n');
+                                res.send("Password does not meet the following requirements: \n" + errorMessages);
+                            } else {
+                                //hash password
+                                const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+                                //insert user
+                                const result = await client.db("Assignment").collection("Users").insertOne({
+                                    _id: data._id,
+                                    password: hashedPassword,
+                                    role: "resident",
+                                    name: data.name,
+                                    apartment: data.apartment,
+                                    phone: data.phone,
+                                    pendingvisitors: [],
+                                    incomingvisitors: [],
+                                    pastvisitors: [],
+                                    blockedvisitors: []
+                                });
+
+                                res.send('New resident created with the following id: ' + result.insertedId);
+                            }
+                        }
+                    } catch (e) {
+                        res.send("Error creating new resident");
+                    }
                 } else {
-                    //hash password
-                    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-
-                    //insert user
-                    const result = await client.db("Assignment").collection("Users").insertOne({
-                        _id: data._id,
-                        password: hashedPassword,
-                        role: "resident",
-                        name: data.name,
-                        apartment: data.apartment,
-                        phone: data.phone,
-                        pendingvisitors: [],
-                        incomingvisitors: [],
-                        pastvisitors: [],
-                        blockedvisitors: []
-                    });
-
-                    res.send('New resident created with the following id: ' + result.insertedId);
+                    res.send("You do not have the previlege to create a new resident");
                 }
-            } catch (e) {
-                res.send("Error creating new resident");
+            else {
+                res.send("You are not logged in");
             }
         });
 
@@ -426,21 +471,31 @@ async function run() {
                         });
 
                         if (result) {
-                            res.send("User already exists");
+                            res.send("Security already exists");
                         } else {
-                            //hash password
-                            const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-
-                            //insert user
-                            const result = await client.db("Assignment").collection("Users").insertOne({
-                                _id: data._id,
-                                password: hashedPassword,
-                                role: "security",
-                                name: data.name,
-                                phone: data.phone
+                            //validate password
+                            const validation = schema.validate(data.password, {
+                                details: true
                             });
 
-                            res.send('New security created with the following id: ' + result.insertedId);
+                            if (validation.length > 0) {
+                                errorMessages = validation.map((detail) => detail.message).join('\n');
+                                res.send("Password does not meet the following requirements: \n" + errorMessages);
+                            } else {
+                                //hash password
+                                const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+                                //insert user
+                                const result = await client.db("Assignment").collection("Users").insertOne({
+                                    _id: data._id,
+                                    password: hashedPassword,
+                                    role: "security",
+                                    name: data.name,
+                                    phone: data.phone
+                                });
+
+                                res.send('New security created with the following id: ' + result.insertedId);
+                            }
                         }
                     } catch (e) {
                         res.send("Error creating new security");
