@@ -26,16 +26,36 @@ const {
 const url = process.env.MONGODB_URI; // the url to the database
 const client = new MongoClient(url); // create a new mongodb client
 
+//unique session id generator middleware
+const {
+    v4: uuidv4
+} = require('uuid');
+
+//connect-mongo session middleware
+const MongoStore = require('connect-mongo');
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    dbName: "Assignment",
+    collectionName: "Sessions",
+    ttl: 60 * 60 * 24, // 1 day
+});
+
 // session middleware
 app.use(session({
+    //generate unique session id
+    genid: (req) => {
+        return uuidv4()
+    },
     secret: process.env.SESSION_SECRET, // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+        //secure:true
     },
-    
+    store:store
 }));
+
 
 // qr code middleware
 var QRCode = require('qrcode')
@@ -105,6 +125,7 @@ async function run() {
             res.redirect('/api-docs');
         });
 
+
         /**
          * @swagger
          * /login:
@@ -141,72 +162,84 @@ async function run() {
             // if user exists, check if password is correct
             if (result) {
                 if (await bcrypt.compare(data.password, result.password)) {
-                    // if password is correct, create a session
-                    req.session.user = {
-                        name: result.name,
-                        username: result._id,
-                        role: result.role,
-                        apartment: result.apartment
-                    }
-                    console.log(req.session);
-                    if (req.session.user.role == "admin") {
-                        try {
-                            result1 = await client.db("Assignment").collection("Users").aggregate([{
-                                    $match: {
-                                        role: "resident"
-                                    }
-                                },
-                                {
-                                    $sort: {
-                                        _id: 1
-                                    }
-                                },
-                                {
-                                    $project: {
-                                        _id: 1,
-                                        name: 1,
-                                        apartment: 1,
-                                        phone: 1,
-                                        pendingvisitors: 1,
-                                        incomingvisitors: 1,
-                                        pastvisitors: 1,
-                                        blockedvisitors: 1
-                                    }
-                                }
-                            ]).toArray();
 
-                            result2 = await client.db("Assignment").collection("Users").aggregate([{
-                                    $match: {
-                                        role: "security"
-                                    }
-                                },
-                                {
-                                    $sort: {
-                                        _id: 1
-                                    }
-                                },
-                                {
-                                    $project: {
-                                        _id: 1,
-                                        name: 1,
-                                        phone: 1,
-                                    }
-                                }
-                            ]).toArray();
+                    console.log('Session ID before regeneration:', req.sessionID, req.session);
 
-                            res.send({
-                                to: req.session.user.name,
-                                message: 'Hello ' + ', you are now logged in as ' + req.session.user.role + '. Here are the list of all residents and securities: ',
-                                residents: result1,
-                                securities: result2
-                            });
-                        } catch (e) {
-                            res.send("Error retrieving visitors");
+                    //regenerate session
+                    req.session.regenerate(async (err) => {
+                        if (err) {
+                            res.send("Error regenerating session");
+                        } else {
+                            // store user details in session
+                            req.session.user = {
+                                name: result.name,
+                                username: result._id,
+                                role: result.role,
+                                apartment: result.apartment
+                            }
+
+                            console.log('Session ID after regeneration:', req.sessionID, req.session);
+
+                            if (req.session.user.role == "admin") {
+                                    try {
+                                        result1 = await client.db("Assignment").collection("Users").aggregate([{
+                                                $match: {
+                                                    role: "resident"
+                                                }
+                                            },
+                                            {
+                                                $sort: {
+                                                    _id: 1
+                                                }
+                                            },
+                                            {
+                                                $project: {
+                                                    _id: 1,
+                                                    name: 1,
+                                                    apartment: 1,
+                                                    phone: 1,
+                                                    pendingvisitors: 1,
+                                                    incomingvisitors: 1,
+                                                    pastvisitors: 1,
+                                                    blockedvisitors: 1
+                                                }
+                                            }
+                                        ]).toArray();
+
+                                        result2 = await client.db("Assignment").collection("Users").aggregate([{
+                                                $match: {
+                                                    role: "security"
+                                                }
+                                            },
+                                            {
+                                                $sort: {
+                                                    _id: 1
+                                                }
+                                            },
+                                            {
+                                                $project: {
+                                                    _id: 1,
+                                                    name: 1,
+                                                    phone: 1,
+                                                }
+                                            }
+                                        ]).toArray();
+
+                                res.send({
+                                    to: req.session.user.name,
+                                    message: 'Hello ' + ', you are now logged in as ' + req.session.user.role + '. Here are the list of all residents and securities: ',
+                                    residents: result1,
+                                    securities: result2
+                                });
+                                } catch (e) {
+                                    res.send("Error retrieving visitors");
+                                }
+
+                            } else {
+                                res.send("Hello " + result.name + ", you are now logged in as " + result.role);
+                            }
                         }
-
-                    } else {
-                        res.send("Hello " + result.name + ", you are now logged in as " + result.role);
-                    }
+                    })
                 } else {
                     res.send("Wrong Username or Password");
                 }
