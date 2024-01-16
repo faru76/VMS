@@ -107,11 +107,10 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Welcome to FaruBon VMS API',
-            version: '1.0.0',
+            title: 'FaruBon VMS API',
         },
     },
-    apis: ['./vms.js'],
+    apis: ['./vms.js']
 };
 
 // swagger docs
@@ -187,8 +186,6 @@ async function run() {
             if (result) {
                 if (await bcrypt.compare(data.password, result.password)) {
 
-                    console.log('Session ID before regeneration:', req.sessionID, req.session);
-
                     //regenerate session
                     req.session.regenerate(async (err) => {
                         if (err) {
@@ -201,8 +198,6 @@ async function run() {
                                 role: result.role,
                                 apartment: result.apartment
                             }
-
-                            console.log('Session ID after regeneration:', req.sessionID, req.session);
 
                             if (req.session.user.role == "admin") {
                                     try {
@@ -1822,8 +1817,7 @@ async function run() {
         });
 
         app.listen(port, () => {
-            //console.log(`Example app listening at http://localhost:${port}`)
-            console.log(`Server is running on port ${process.env.PORT || 3000}`);
+            console.log(`Server is running on port ${process.env.PORT}`);
         });
 
         app.use((err, req, res, next) => {
