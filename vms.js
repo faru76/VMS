@@ -37,7 +37,7 @@ const store = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     dbName: "Assignment",
     collectionName: "Sessions",
-    ttl: 60 * 60 * 24, // 1 day
+    //ttl will be automatically set to the maxAge (1 hour)
     crypto:{
         secret: process.env.SESSION_SAVE_SECRET
     }
@@ -53,13 +53,33 @@ app.use(session({
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 1 day
+        maxAge: 1000 * 60 * 60, // 1 hour
         httpOnly:true,
         sameSite:"strict"
     },
     store:store
 }));
 
+//check and refresh the session
+app.use((req, res, next) => {
+    //check if the session is about to expire
+    if (req.session) {
+        if (req.session.cookie.maxAge < 1000 * 60 * 5) { // 5 minutes
+            //refresh the session
+            req.session.regenerate((err) => {
+                if (err) {
+                    res.send("Error refreshing session");
+                } else {
+                    next();
+                }
+            })
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+});
 
 // qr code middleware
 var QRCode = require('qrcode')
