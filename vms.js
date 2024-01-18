@@ -379,56 +379,48 @@ async function run() {
          *         description: Reply from the server
          */
         app.post('/register/testresident', async (req, res) => {
-            if (req.session.user)
-                if (req.session.user.role == "admin") {
-                    data = req.body;
-                    try {
-                        //check if user already exists
-                        result = await client.db("Assignment").collection("Users").findOne({
+            data = req.body;
+            try {
+                //check if user already exists
+                result = await client.db("Assignment").collection("Users").findOne({
+                    _id: data._id,
+                    role: "resident"
+                });
+
+                if (result) {
+                    res.send("Resident already exists");
+                } else {
+                    //validate password
+                    const validation = schema.validate(data.password, {
+                        details: true
+                    });
+
+                    if (validation.length > 0) {
+                        errorMessages = validation.map((detail) => detail.message).join('\n');
+                        res.send("Password does not meet the following requirements: \n" + errorMessages);
+                    } else {
+                        //hash password
+                        const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+                        //insert user
+                        const result = await client.db("Assignment").collection("Users").insertOne({
                             _id: data._id,
-                            role: "resident"
+                            password: hashedPassword,
+                            role: "resident",
+                            name: data.name,
+                            apartment: data.apartment,
+                            phone: data.phone,
+                            pendingvisitors: [],
+                            incomingvisitors: [],
+                            pastvisitors: [],
+                            blockedvisitors: []
                         });
 
-                        if (result) {
-                            res.send("Resident already exists");
-                        } else {
-                            //validate password
-                            const validation = schema.validate(data.password, {
-                                details: true
-                            });
-
-                            if (validation.length > 0) {
-                                errorMessages = validation.map((detail) => detail.message).join('\n');
-                                res.send("Password does not meet the following requirements: \n" + errorMessages);
-                            } else {
-                                //hash password
-                                const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-
-                                //insert user
-                                const result = await client.db("Assignment").collection("Users").insertOne({
-                                    _id: data._id,
-                                    password: hashedPassword,
-                                    role: "resident",
-                                    name: data.name,
-                                    apartment: data.apartment,
-                                    phone: data.phone,
-                                    pendingvisitors: [],
-                                    incomingvisitors: [],
-                                    pastvisitors: [],
-                                    blockedvisitors: []
-                                });
-
-                                res.send('New resident created with the following id: ' + result.insertedId);
-                            }
-                        }
-                    } catch (e) {
-                        res.send("Error creating new resident");
+                        res.send('New resident created with the following id: ' + result.insertedId);
                     }
-                } else {
-                    res.send("You do not have the previlege to create a new resident");
                 }
-            else {
-                res.send("You are not logged in");
+            } catch (e) {
+                res.send("Error creating new resident");
             }
         });
 
@@ -1810,6 +1802,7 @@ async function run() {
         app.get('/logout', async (req, res) => {
             if (req.session.user) {
                 req.session.destroy();
+
                 res.send("You have been logged out");
             } else {
                 res.send("You are not logged in");
